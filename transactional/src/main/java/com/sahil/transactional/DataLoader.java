@@ -19,8 +19,7 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        Product p1 = new Product();
-        service.addProduct(p1, "tomato");
+        service.addTenProduct();
     }
 
 }

@@ -6,6 +6,7 @@ import com.sahil.transactional.entities.Product;
 import com.sahil.transactional.repo.ProductRepo;
 
 import jakarta.transaction.Transactional;
+import jakarta.transaction.Transactional.TxType;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -17,21 +18,43 @@ public class ProductService {
 
     private final ProductRepo productRepo;
 
-    @Transactional
     // can use @Transactional(rollBackOn) to add Exception for which it should be
     // rolled back
     // by default it is for RuntimeException
     // Exception should be thrown outside method to make use of @Transactional ,
     // meaning using try-catch
     // will not work for rollback
+
+    // Propagation
+    // REQUIRED -> default , if transaction not there it create otherwise use already transaction context
+    // REQUIRES_NEW -> Always create a new transaction not matter if it exsists or not
+    // MANDATORY -> it will throw Exception if no transaction is there while calling method otherwise 
+    // use the already exsisting transaction context
+    // NEVER -> opposite of MANDATORY
+    // SUPPORTS -> if transaction exsists then no issue , same if no transaction it run 
+    // NOT_SUPPORTED -> only execute without transaction, even if there is transaction exsists
+    @Transactional(value = TxType.REQUIRES_NEW)
     public void addProduct(Product product, String name) {
         product.setName(name);
         productRepo.save(product);
-        throw new RuntimeException(":(");
         // try {
         // throw new RuntimeException();
         // } catch (Exception e) {
         // e.printStackTrace();
         // }
+    }
+
+    @Transactional
+    public void addTenProduct() {
+        try {
+            for (int i = 0; i < 10; i++) {
+                Product p = new Product();
+                addProduct(p, "Product" + i);
+                if (i == 5)
+                    throw new RuntimeException();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
