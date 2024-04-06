@@ -1,6 +1,7 @@
 package com.sahil.transactional.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 
 import com.sahil.transactional.entities.Product;
 import com.sahil.transactional.repo.ProductRepo;
@@ -44,6 +45,16 @@ public class ProductService {
         // }
     }
 
+    // Isolation 
+    // Problems 
+    //   - dirty reads
+    //   - repetable reads
+    //   - phantom reads
+    // four option
+    // - READ_COMMITTED -> read value after committed 
+    // - READ_UNCOMMITTED -> read value even when uncommitted 
+    // - REPETABLE_READ 
+    // - SERIALIZABLE -> highest level of isolation
     @Transactional
     public void addTenProduct() {
         try {
