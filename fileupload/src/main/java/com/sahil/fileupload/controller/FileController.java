@@ -1,12 +1,14 @@
 package com.sahil.fileupload.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,34 +31,38 @@ public class FileController {
 
     private StorageService storageService;
 
+    public FileController(StorageService service) {
+        this.storageService = service;
+    }
+
     @GetMapping(path = "/all")
     public ResponseEntity<List<String>> listFiles() throws IOException {
         List<String> uris = storageService.loadAll().map(
-				path -> MvcUriComponentsBuilder.fromMethodName(FileController.class,
-						"getfile", path.getFileName().toString()).build().toUri().toString())
-				.collect(Collectors.toList());
-            return ResponseEntity.ok(uris);
+                path -> MvcUriComponentsBuilder.fromMethodName(FileController.class,
+                        "getfile", path.getFileName().toString()).build().toUri().toString())
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(uris);
     }
 
     @GetMapping(path = "/{filename:.+}")
     public ResponseEntity<Resource> getfile(@PathVariable String filename) {
 
-        Resource file = storageService.loadAsResource(filename);
-
-        if (file == null) {
+        try {
+            Resource file = storageService.loadAsResource(filename);
+            if (file == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
+                    "attachment; filename=\"" + file.getFilename() + "\"").body(file);
+        } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
-                "attachment; filename=\"" + file.getFilename() + "\"").body(file);
-
     }
 
-    @PostMapping(path = "/upload")
-    public String uploadFile(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
+    @PostMapping(path = "/")
+    public String uploadFile(@RequestParam("file") MultipartFile file) {
         storageService.store(file);
-        redirectAttributes.addFlashAttribute("message",
-                "Your file has been uploaded " + file.getOriginalFilename() + "!");
-        return "redirect:/";
+        return "File uploaded";
     }
 
 }
