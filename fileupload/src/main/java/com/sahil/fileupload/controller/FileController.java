@@ -1,8 +1,10 @@
 package com.sahil.fileupload.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 
-import org.hibernate.mapping.List;
+import java.util.List;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -27,12 +29,13 @@ public class FileController {
 
     private StorageService storageService;
 
-    @GetMapping(path = "/")
-    public ResponseEntity<String> listFiles() throws IOException {
-        List<String> uris = storageService.loadAll()
-                .map(path -> MvcUriComponentsBuilder.fromMethodName(FileController.class, "getfile", path.getFileName()
-                        .toString().build().toUri().toString()).collect(Collectors.toList()));
-        return ResponseEntity.ok(uris);
+    @GetMapping(path = "/all")
+    public ResponseEntity<List<String>> listFiles() throws IOException {
+        List<String> uris = storageService.loadAll().map(
+				path -> MvcUriComponentsBuilder.fromMethodName(FileController.class,
+						"getfile", path.getFileName().toString()).build().toUri().toString())
+				.collect(Collectors.toList());
+            return ResponseEntity.ok(uris);
     }
 
     @GetMapping(path = "/{filename:.+}")
@@ -48,12 +51,12 @@ public class FileController {
 
     }
 
-    @PostMapping(path = "/")
+    @PostMapping(path = "/upload")
     public String uploadFile(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
         storageService.store(file);
         redirectAttributes.addFlashAttribute("message",
                 "Your file has been uploaded " + file.getOriginalFilename() + "!");
         return "redirect:/";
-
     }
+
 }
