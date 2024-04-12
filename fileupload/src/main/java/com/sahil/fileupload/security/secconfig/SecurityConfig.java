@@ -1,4 +1,4 @@
-package com.sahil.fileupload.security;
+package com.sahil.fileupload.security.secconfig;
 
 import org.springframework.boot.web.server.AbstractConfigurableWebServerFactory;
 import org.springframework.context.annotation.Bean;
