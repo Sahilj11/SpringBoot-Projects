@@ -1,20 +1,14 @@
 package com.sahil.fileupload.security;
 
+import com.sahil.fileupload.entities.UserEntity;
+import com.sahil.fileupload.security.service.SecurityAuthority;
 import java.util.Collection;
-import java.util.List;
 import java.util.stream.Collectors;
-
+import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.sahil.fileupload.entities.UserEntity;
-import com.sahil.fileupload.security.service.SecurityAuthority;
-
-import lombok.AllArgsConstructor;
-
-/**
- * SecurityUser
- */
+/** SecurityUser */
 @AllArgsConstructor
 public class SecurityUser implements UserDetails {
 
@@ -22,10 +16,7 @@ public class SecurityUser implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return userEntity.getRoles()
-                .stream()
-                .map(SecurityAuthority::new)
-                .collect(Collectors.toList());
+        return userEntity.getRoles().stream().map(SecurityAuthority::new).collect(Collectors.toList());
     }
 
     @Override
@@ -57,5 +48,4 @@ public class SecurityUser implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
 }

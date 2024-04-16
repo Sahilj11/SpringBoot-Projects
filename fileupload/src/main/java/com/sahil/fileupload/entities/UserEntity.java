@@ -1,9 +1,5 @@
 package com.sahil.fileupload.entities;
 
-import java.util.Set;
-
-import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -14,12 +10,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * UserEntity
- */
+/** UserEntity */
 @Entity
 @Table(name = "user_info")
 @Getter
@@ -42,5 +37,4 @@ public class UserEntity {
     @JoinTable(name = "user_rolesjoin", joinColumns = { @JoinColumn(name = "user_id") }, inverseJoinColumns = {
             @JoinColumn(name = "roles_id") })
     private Set<Roles> roles;
-
 }
