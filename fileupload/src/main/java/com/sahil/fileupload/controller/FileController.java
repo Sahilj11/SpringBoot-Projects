@@ -31,10 +31,6 @@ public class FileController {
 
     private StorageService storageService;
 
-    public FileController(StorageService service) {
-        this.storageService = service;
-    }
-
     @GetMapping(path = "/all")
     public ResponseEntity<List<String>> listFiles() throws IOException {
         List<String> uris = storageService.loadAll().map(

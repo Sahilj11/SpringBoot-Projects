@@ -19,11 +19,13 @@ public class AuthController {
 
     @PostMapping(path = "login")
     public String login(@RequestBody Authlogindto authlogindto) {
-        return aService.login(authlogindto.username(), authlogindto.password());
+        aService.login(authlogindto.username(), authlogindto.password());
+        return "login";
     }
 
     @PostMapping(path = "signup")
     public String signup(@RequestBody Authsignupdto authsignupdto) {
-        return aService.signup(authsignupdto);
+        aService.signup(authsignupdto);
+        return "authsuccess";
     }
 }
