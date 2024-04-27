@@ -22,14 +22,17 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.sahil.fileupload.service.StorageService;
 
+import lombok.AllArgsConstructor;
+
 /**
  * FileController
  */
 @RestController
 @RequestMapping(path = "/file-api")
+@AllArgsConstructor
 public class FileController {
 
-    private StorageService storageService;
+    private final StorageService storageService;
 
     @GetMapping(path = "/all")
     public ResponseEntity<List<String>> listFiles() throws IOException {

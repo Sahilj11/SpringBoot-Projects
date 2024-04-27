@@ -4,6 +4,7 @@ import com.sahil.fileupload.entities.UserEntity;
 import com.sahil.fileupload.repo.RolesRepo;
 import com.sahil.fileupload.repo.UserRepo;
 import com.sahil.fileupload.security.dto.Authsignupdto;
+import com.sahil.fileupload.security.secconfig.CustomUserDetailsService;
 
 import java.util.Optional;
 import java.util.Set;
@@ -21,7 +22,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserRepo userRepo;
     private final PasswordEncoder encoder;
-    private final UserDetailsService userDetailsService;
+    private final CustomUserDetailsService userDetailsService;
     private final RolesRepo roles;
 
     @Override
