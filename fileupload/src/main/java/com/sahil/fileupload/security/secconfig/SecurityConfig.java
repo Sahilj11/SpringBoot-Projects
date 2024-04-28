@@ -19,7 +19,6 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors(AbstractHttpConfigurer::disable);
         http.csrf(AbstractHttpConfigurer::disable);
-        http.httpBasic();
 
         http.authorizeHttpRequests(
                 req -> req.requestMatchers("/api/auth/login/**")
@@ -30,6 +29,7 @@ public class SecurityConfig {
                         .hasAuthority("FREE"));
 
         http.exceptionHandling(exception -> exception.authenticationEntryPoint(authEntryPoint));
+        // http.formLogin(login-> login.loginPage("/api/auth/login").permitAll());
         return http.build();
     }
 }

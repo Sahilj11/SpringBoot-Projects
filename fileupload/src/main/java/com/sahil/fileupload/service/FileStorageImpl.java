@@ -9,29 +9,42 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.stream.Stream;
 
+import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.sahil.fileupload.security.service.UserLogin;
 import com.sahil.fileupload.storageconfig.StorageException;
 import com.sahil.fileupload.storageconfig.StorageFileNotFound;
 import com.sahil.fileupload.storageconfig.StorageProperties;
+
+import jakarta.security.auth.message.AuthException;
 
 /**
  * FileStorageImpl
  */
 @Service
+@Scope("prototype")
 public class FileStorageImpl implements StorageService {
 
-    private final Path rootLocation;
+    private  Path rootLocation;
 
     public FileStorageImpl(StorageProperties storageProperties) {
         if (storageProperties.getLocation().trim().length() == 0) {
 
         }
-        this.rootLocation = Paths.get(storageProperties.getLocation());
+        UserLogin userLogin = new UserLogin();
+        try {
+            String loggedInUser = userLogin.getUserName();
+            String newLoc = storageProperties.getLocation()+loggedInUser;
+            storageProperties.setLocation(newLoc);
+            this.rootLocation = Paths.get(storageProperties.getLocation());
+        } catch (AuthException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

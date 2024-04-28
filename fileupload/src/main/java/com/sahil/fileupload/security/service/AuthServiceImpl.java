@@ -5,15 +5,15 @@ import com.sahil.fileupload.repo.RolesRepo;
 import com.sahil.fileupload.repo.UserRepo;
 import com.sahil.fileupload.security.dto.Authsignupdto;
 import com.sahil.fileupload.security.secconfig.CustomUserDetailsService;
+import com.sahil.fileupload.storageconfig.StorageProperties;
 
-import java.util.Optional;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 /** AuthServiceImpl */
 @Service
@@ -24,10 +24,11 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder encoder;
     private final CustomUserDetailsService userDetailsService;
     private final RolesRepo roles;
+    private final StorageProperties properties;
 
     @Override
     public void login(String username, String password) {
-            userDetailsService.loadUserByUsername(username);
+        userDetailsService.loadUserByUsername(username);
     }
 
     @Override
@@ -41,5 +42,10 @@ public class AuthServiceImpl implements AuthService {
         userEntity.setPassword(encoder.encode(authsignupdto.password()));
         userEntity.setRoles(Set.of(roles.findByRole("FREE")));
         userRepo.save(userEntity);
+        try {
+            Files.createDirectories(Paths.get(properties.getLocation()+authsignupdto.username()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
