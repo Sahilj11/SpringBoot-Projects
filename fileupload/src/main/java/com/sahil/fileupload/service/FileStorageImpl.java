@@ -1,5 +1,9 @@
 package com.sahil.fileupload.service;
 
+import com.sahil.fileupload.security.service.UserLogged;
+import com.sahil.fileupload.storageconfig.StorageException;
+import com.sahil.fileupload.storageconfig.StorageFileNotFound;
+import com.sahil.fileupload.storageconfig.StorageProperties;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -8,43 +12,23 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.stream.Stream;
-
-import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.sahil.fileupload.security.service.UserLogin;
-import com.sahil.fileupload.storageconfig.StorageException;
-import com.sahil.fileupload.storageconfig.StorageFileNotFound;
-import com.sahil.fileupload.storageconfig.StorageProperties;
-
-import jakarta.security.auth.message.AuthException;
-
-/**
- * FileStorageImpl
- */
+/** FileStorageImpl */
 @Service
-@Scope("prototype")
 public class FileStorageImpl implements StorageService {
 
-    private  Path rootLocation;
+    private Path rootLocation;
 
     public FileStorageImpl(StorageProperties storageProperties) {
         if (storageProperties.getLocation().trim().length() == 0) {
+        }
 
-        }
-        UserLogin userLogin = new UserLogin();
-        try {
-            String loggedInUser = userLogin.getUserName();
-            String newLoc = storageProperties.getLocation()+loggedInUser;
-            storageProperties.setLocation(newLoc);
-            this.rootLocation = Paths.get(storageProperties.getLocation());
-        } catch (AuthException e) {
-            e.printStackTrace();
-        }
+        this.rootLocation = Paths.get(storageProperties.getLocation());
     }
 
     @Override
@@ -54,15 +38,21 @@ public class FileStorageImpl implements StorageService {
 
     @Override
     public Path load(String filename) {
-        return rootLocation.resolve(filename);
+        UserLogged uLogged = new UserLogged();
+        String userName = uLogged.getLogged();
+        Path location = Paths.get(userName + "/" + filename);
+        return rootLocation.resolve(location);
     }
 
     @Override
     public Stream<Path> loadAll() {
         try {
-            return Files.walk(this.rootLocation, 1)
-                    .filter(path -> !path.equals(this.rootLocation))
-                    .map(this.rootLocation::relativize);
+            UserLogged uLogged = new UserLogged();
+            String userName = uLogged.getLogged();
+            Path location = Paths.get(this.rootLocation + "/" + userName);
+            return Files.walk(location, 1)
+                    .filter(path -> !path.equals(location))
+                    .map(location::relativize);
         } catch (IOException e) {
             throw new StorageException("Failed to find files");
         }
@@ -80,7 +70,7 @@ public class FileStorageImpl implements StorageService {
                 throw new StorageException("Could not read the file " + filename);
             }
         } catch (MalformedURLException e) {
-            throw new StorageFileNotFound("Could not read the file "+ filename);
+            throw new StorageFileNotFound("Could not read the file " + filename);
         }
     }
 
@@ -90,8 +80,12 @@ public class FileStorageImpl implements StorageService {
             if (file.isEmpty()) {
                 throw new StorageException("File is empty");
             }
-            Path destination = this.rootLocation.resolve(Paths.get(file.getOriginalFilename()))
-                    .normalize().toAbsolutePath();
+            UserLogged uLogged = new UserLogged();
+            String userName = uLogged.getLogged();
+            Path destination = this.rootLocation
+                    .resolve(Paths.get(userName + "/" + file.getOriginalFilename()))
+                    .normalize()
+                    .toAbsolutePath();
             System.out.println(destination.toString());
             try (InputStream is = file.getInputStream()) {
                 Files.copy(is, destination, StandardCopyOption.REPLACE_EXISTING);
@@ -109,5 +103,4 @@ public class FileStorageImpl implements StorageService {
             throw new StorageException("Failed to create directories");
         }
     }
-
 }

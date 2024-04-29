@@ -29,6 +29,7 @@ public class SecurityConfig {
                         .hasAuthority("FREE"));
 
         http.exceptionHandling(exception -> exception.authenticationEntryPoint(authEntryPoint));
+        http.httpBasic();
         // http.formLogin(login-> login.loginPage("/api/auth/login").permitAll());
         return http.build();
     }

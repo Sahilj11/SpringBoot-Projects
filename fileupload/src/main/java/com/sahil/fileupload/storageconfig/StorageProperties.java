@@ -1,6 +1,7 @@
 package com.sahil.fileupload.storageconfig;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 import lombok.AllArgsConstructor;
@@ -9,8 +10,6 @@ import lombok.AllArgsConstructor;
  * StorageProperties
  */
 @ConfigurationProperties(prefix = "storage")
-@Component
-@AllArgsConstructor
 public class StorageProperties {
 
     private String location;
