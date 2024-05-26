@@ -9,6 +9,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,20 +24,28 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(path = "/api/auth/")
 @RequiredArgsConstructor
+@Slf4j
 public class AuthController {
 
     private final AuthService aService;
     private final StorageProperties properties;
 
     @PostMapping(path = "login")
-    public String login(@RequestBody Authlogindto authlogindto) {
-        aService.login(authlogindto.username(), authlogindto.password());
-        return "login";
+    public ResponseEntity<String> login(@RequestBody Authlogindto authlogindto) {
+        ResponseEntity<String> login = aService.login(authlogindto.username(), authlogindto.password());
+        if (!login.getStatusCode().equals(HttpStatus.OK)) {
+            return ResponseEntity.status(login.getStatusCode()).build();
+        }
+        log.warn(SecurityContextHolder.getContext().getAuthentication().toString());
+        return ResponseEntity.ok(login.getBody());
     }
 
     @PostMapping(path = "signup")
-    public String signup(@RequestBody Authsignupdto authsignupdto) {
-        aService.signup(authsignupdto);
+    public ResponseEntity<String> signup(@RequestBody Authsignupdto authsignupdto) {
+        ResponseEntity<String> signup = aService.signup(authsignupdto);
+        if (!signup.getStatusCode().equals(HttpStatus.OK)) {
+            return ResponseEntity.status(signup.getStatusCode()).build();
+        }
         try {
             Path p1 = Paths.get(properties.getLocation());
             Path p2 = Paths.get(authsignupdto.username());
@@ -39,6 +53,6 @@ public class AuthController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return "authsuccess";
+        return ResponseEntity.ok(signup.getBody());
     }
 }

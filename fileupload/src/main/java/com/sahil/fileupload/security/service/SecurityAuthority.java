@@ -3,9 +3,6 @@ package com.sahil.fileupload.security.service;
 import org.springframework.security.core.GrantedAuthority;
 
 import com.sahil.fileupload.entities.Roles;
-import com.sahil.fileupload.entities.UserEntity;
-import com.sahil.fileupload.security.SecurityUser;
-
 import lombok.AllArgsConstructor;
 
 /**

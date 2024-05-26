@@ -6,11 +6,13 @@ import com.sahil.fileupload.repo.UserRepo;
 import com.sahil.fileupload.security.dto.Authsignupdto;
 import com.sahil.fileupload.security.jwt.JwtService;
 import com.sahil.fileupload.security.secconfig.CustomUserDetailsService;
+import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,12 +28,20 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jService;
 
     @Override
-    public void login(String username, String password) {
-        userDetailsService.loadUserByUsername(username);
+    public ResponseEntity<String> login(String username, String password) {
+        try {
+            UserDetails userByUsername = userDetailsService.loadUserByUsername(username);
+            Optional<UserEntity> byUsername = userRepo.findByUsername(userByUsername.getUsername());
+            String jwtGenerate = jService.jwtGenerate(byUsername.orElseThrow());
+            return ResponseEntity.ok(jwtGenerate);
+        } catch (UsernameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     @Override
-    public ResponseEntity<?> signup(Authsignupdto authsignupdto) {
+    public ResponseEntity<String> signup(Authsignupdto authsignupdto) {
         if (!authsignupdto.password().equals(authsignupdto.confirmPass())) {
             throw new RuntimeException("Password not match");
         }
@@ -47,7 +57,6 @@ public class AuthServiceImpl implements AuthService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //TODO: what to return
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 }

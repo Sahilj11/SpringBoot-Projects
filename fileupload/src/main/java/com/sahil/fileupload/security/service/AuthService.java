@@ -1,15 +1,15 @@
 package com.sahil.fileupload.security.service;
 
-import com.sahil.fileupload.entities.UserEntity;
+import org.springframework.http.ResponseEntity;
+
 import com.sahil.fileupload.security.dto.Authsignupdto;
-import com.sahil.fileupload.security.jwt.AuthenticationResponse;
 
 /**
  * AuthService
  */
 public interface AuthService {
 
-    void login(String username, String password);
+    ResponseEntity<String> login(String username, String password);
 
-    String signup(Authsignupdto authsignupdto);
+    ResponseEntity<String> signup(Authsignupdto authsignupdto);
 }

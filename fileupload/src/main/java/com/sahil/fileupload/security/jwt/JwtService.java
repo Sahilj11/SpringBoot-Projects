@@ -6,15 +6,17 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Date;
 import java.util.function.Function;
 import javax.crypto.SecretKey;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 /** Jwtgenerator */
 @Service
+@Slf4j
 public class JwtService {
 
     private final String SECRET_KEY = "a647f060250f5ab787964f33ccf786ba641fed0b255495d7d20808f58242a7d9";
@@ -29,6 +31,7 @@ public class JwtService {
                 .expiration(expireDate)
                 .signWith(getSigninKey())
                 .compact();
+        log.info(jwtToken);
         return jwtToken;
     }
 
@@ -51,6 +54,7 @@ public class JwtService {
     }
 
     public boolean verifyToken(String token, UserDetails user) {
+        log.info("Token is "+token+" user is "+ user.getUsername());
         return extractUsername(token).equals(user.getUsername()) && !isTokenExpired(token);
     }
 

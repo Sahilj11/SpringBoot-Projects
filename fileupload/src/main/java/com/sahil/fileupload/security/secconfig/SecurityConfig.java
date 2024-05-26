@@ -3,6 +3,7 @@ package com.sahil.fileupload.security.secconfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -31,7 +32,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/signup/**")
                         .permitAll()
                         .anyRequest()
-                        .hasAuthority("FREE"));
+                        .authenticated());
 
         http.exceptionHandling(exception -> exception.authenticationEntryPoint(authEntryPoint));
         http.sessionManagement(
@@ -39,4 +40,5 @@ public class SecurityConfig {
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
+
 }
