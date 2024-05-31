@@ -4,6 +4,9 @@ import com.sahil.fileupload.security.dto.Authlogindto;
 import com.sahil.fileupload.security.dto.Authsignupdto;
 import com.sahil.fileupload.security.service.AuthService;
 import com.sahil.fileupload.storageconfig.StorageProperties;
+
+import jakarta.validation.Valid;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,7 +34,7 @@ public class AuthController {
     private final StorageProperties properties;
 
     @PostMapping(path = "login")
-    public ResponseEntity<String> login(@RequestBody Authlogindto authlogindto) {
+    public ResponseEntity<String> login(@Valid @RequestBody Authlogindto authlogindto) {
         ResponseEntity<String> login = aService.login(authlogindto.username(), authlogindto.password());
         if (!login.getStatusCode().equals(HttpStatus.OK)) {
             return ResponseEntity.status(login.getStatusCode()).build();
@@ -41,7 +44,7 @@ public class AuthController {
     }
 
     @PostMapping(path = "signup")
-    public ResponseEntity<String> signup(@RequestBody Authsignupdto authsignupdto) {
+    public ResponseEntity<String> signup(@Valid @RequestBody Authsignupdto authsignupdto) {
         ResponseEntity<String> signup = aService.signup(authsignupdto);
         if (!signup.getStatusCode().equals(HttpStatus.OK)) {
             return ResponseEntity.status(signup.getStatusCode()).build();
