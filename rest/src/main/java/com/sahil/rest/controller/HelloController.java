@@ -62,5 +62,4 @@ public class HelloController {
         byte[] test = new byte[100];
         return test;
     }
-
 }
